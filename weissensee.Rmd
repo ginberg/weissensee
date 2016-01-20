@@ -1,5 +1,5 @@
 ---
-title: "Weissensee results exploration"
+title: "Weissensee 2015 results exploration"
 author: "Ger Inberg"
 date: "20-01-2016"
 output: html_document
@@ -7,7 +7,7 @@ output: html_document
 
 ## Introduction
 One of my hobbies is ice-skating and last year I have done the "Weissensee" for the first time. It is an ice skating event held in Austria, over a distance of 200km. The most participants are from the Netherlands. Unfortunately we don't have enough ice on our lakes, to organize such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
-First I have scraped the data from the Weissensee website to a csv file, with a python script.
+First I have scraped the data from the Weissensee website to a csv file, with a [python script](weissensee_scraper.py).
 
 <iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>
 
@@ -23,12 +23,10 @@ library(gridExtra)
 library(GGally)
 ```
 
-
+## Dataset info
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
 # Load the Data, combine the two datasets and print some basics
 weissensee <-read.csv("data/weissensee_results.csv", header=TRUE, sep = ";") 
-
-dim(weissensee)
 str(weissensee)
 ```
 
@@ -37,10 +35,17 @@ str(weissensee)
 #plot histograms of interesting features
 #finish time
 weissensee$Time <- as.POSIXct(strptime(weissensee$Time, format="%H:%M:%S"))
-ggplot(data = weissensee, aes(x=Time)) + geom_histogram()
+ggplot(data = weissensee[weissensee$Laps==16,], aes(x=Time)) + geom_histogram() + 
+  ggtitle("Distribution of finish times")
 #summary(weissensee$Time)
 
 #country
-ggplot(data = weissensee, aes(x=Country)) + geom_histogram()
-summary(weissensee$Country)
+ggplot(data = weissensee, aes(x=Country)) + geom_histogram() + 
+  scale_y_log10() + ggtitle("Country of residence of participants")
+summary(weissensee$Country) 
+
+#Laps
+ggplot(data = weissensee, aes(x=Distance)) + geom_histogram() +
+  scale_y_sqrt() + ggtitle("Distribution of covered distance")
+summary(weissensee$Distance)
 ```
