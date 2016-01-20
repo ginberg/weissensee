@@ -70,7 +70,7 @@ for(i in 1:length(names)){
 #length(unique(weissensee_triple$Name))
 ggplot(data = weissensee_triple, aes(x=factor(EventId), y=Time, color=Name)) + 
   geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=c("23-1","27-1","30-1")) + 
-  xlab('Date') + xlab('Finish time')
+  xlab('Date') + ylab('Finish time')
 ```
 
 So, there were 6 brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
