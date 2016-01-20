@@ -1,0 +1,46 @@
+---
+title: "Weissensee results exploration"
+author: "Ger Inberg"
+date: "20-01-2016"
+output: html_document
+---
+
+## Introduction
+One of my hobbies is ice-skating and last year I have done the "Weissensee" for the first time. It is an ice skating event held in Austria, over a distance of 200km. The most participants are from the Netherlands. Unfortunately we don't have enough ice on our lakes, to organize such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
+First I have scraped the data from the Weissensee website to a csv file, with a python script.
+
+<iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that I need.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+library(GGally)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
+# Load the Data, combine the two datasets and print some basics
+weissensee <-read.csv("data/weissensee_results.csv", header=TRUE, sep = ";") 
+
+dim(weissensee)
+str(weissensee)
+```
+
+# Univariate Plots Section
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
+#plot histograms of interesting features
+#finish time
+weissensee$Time <- as.POSIXct(strptime(weissensee$Time, format="%H:%M:%S"))
+ggplot(data = weissensee, aes(x=Time)) + geom_histogram()
+#summary(weissensee$Time)
+
+#country
+ggplot(data = weissensee, aes(x=Country)) + geom_histogram()
+summary(weissensee$Country)
+```
