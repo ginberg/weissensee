@@ -1,7 +1,7 @@
 ---
-title: "Weissensee 2015 results exploration"
-author: "Ger Inberg"
-date: "20-01-2016"
+[comment]: <> (title "Weissensee 2015 results exploration")
+[comment2]: <> (author "Ger Inberg")
+[comment3]: <> (date "20-01-2016")
 output: html_document
 ---
 
