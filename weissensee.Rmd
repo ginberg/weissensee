@@ -20,9 +20,6 @@ First I have scraped the data from the Weissensee website to a csv file, with a 
 # This prevents the code from displaying in the knitted HTML output.
 
 library(ggplot2)
-library(dplyr)
-library(gridExtra)
-library(GGally)
 ```
 
 ## Dataset info
@@ -32,22 +29,51 @@ weissensee <-read.csv("data/weissensee_results.csv", header=TRUE, sep = ";")
 str(weissensee)
 ```
 
-# Univariate Plots Section
+## Univariate Plots Section
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
 #plot histograms of interesting features
-#finish time
-weissensee$Time <- as.POSIXct(strptime(weissensee$Time, format="%H:%M:%S"))
-ggplot(data = weissensee[weissensee$Laps==16,], aes(x=Time)) + geom_histogram() + 
-  ggtitle("Distribution of finish times (200km)")
-#summary(weissensee$Time)
+#finish time 200km
+weissensee200km <- weissensee[weissensee$Laps==16, ]
+weissensee200km$TimeFormatted  <- as.POSIXct(strptime(weissensee200km$Time, format="%H:%M:%S"))
+ggplot(data = weissensee200km, aes(x=TimeFormatted)) + geom_histogram() + 
+  ggtitle("Distribution of finish times (200km)") + xlab('Time (hours)') + 
+  ylab('count')
+summary(weissensee200km$Time)
 
 #country
 ggplot(data = weissensee, aes(x=Country)) + geom_histogram() + 
-  scale_y_log10() + ggtitle("Country of residence of participants")
+  scale_y_log10() + ggtitle("Country of residence of participants") + 
+  xlab('Country') + ylab('count (log scale)')
 summary(weissensee$Country) 
 
-#Laps
+#Distance
 ggplot(data = weissensee, aes(x=Distance)) + geom_histogram() +
-  scale_y_sqrt() + ggtitle("Distribution of covered distance")
+  scale_y_sqrt() + ggtitle("Distribution of covered distance") + 
+  xlab('Distance') + ylab('count (sqrt scale)')
 summary(weissensee$Distance)
 ```
+
+## Weissensee triple
+
+Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 times in a period of 10 days and I want to know how many people finished 3 times in the full distance and if there is a relation between their finish times.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Triple}
+weissensee_triple <- c()
+names <- unique(weissensee200km$Name)
+for(i in 1:length(names)){
+  name = names[i]
+  temp <- weissensee200km[weissensee200km$Name == name, ]
+  if(nrow(temp) == 3){
+    weissensee_triple <- rbind(weissensee_triple, temp)
+  }
+}
+length(unique(weissensee_triple$Name))
+ggplot(data = weissensee_triple, aes(x=factor(EventId), y=Time, color=Name)) + 
+  geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=c("23-1","27-1","30-1")) + 
+  xlab('Date') + xlab('Finish time')
+```
+So, there were 6 brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
+Some ideas for future work
+- relate the finish times to weather conditions (wind, snow conditions, temperature)
+- compare the year 2015 to results of other years and look for trends
+
