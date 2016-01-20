@@ -6,10 +6,12 @@ output: html_document
 ---
 
 ## Introduction
-One of my hobbies is ice-skating and last year I have done the "Weissensee" for the first time. It is an ice skating event held in Austria, over a distance of 200km. The most participants are from the Netherlands. Unfortunately we don't have enough ice on our lakes, to organize such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
+One of my hobbies is ice-skating and last year I have done the "Weissensee" for the first time. It is an ice skating event held in Austria, over a distance of 200km ([video](https://www.youtube.com/watch?v=FhdifsMYr8s)).
+
+Most participants are from the Netherlands, unfortunately they don't have enough ice on their lakes, to organize such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
 First I have scraped the data from the Weissensee website to a csv file, with a [python script](weissensee_scraper.py).
 
-<iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>
+[comment4]: <> (<iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
 # Load all of the packages that I need.
@@ -36,7 +38,7 @@ str(weissensee)
 #finish time
 weissensee$Time <- as.POSIXct(strptime(weissensee$Time, format="%H:%M:%S"))
 ggplot(data = weissensee[weissensee$Laps==16,], aes(x=Time)) + geom_histogram() + 
-  ggtitle("Distribution of finish times")
+  ggtitle("Distribution of finish times (200km)")
 #summary(weissensee$Time)
 
 #country
