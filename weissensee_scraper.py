@@ -37,7 +37,7 @@ class ScrapeUser:
             self.getPersonalia()
         return self.persondict
 
-class ScrapeUsers:
+class ScrapeEvent:
     
     #Amount of records
     AMOUNT_OF_RECORDS = 2000
@@ -52,13 +52,12 @@ class ScrapeUsers:
     def requestMainDataPage(self):
         page = urllib2.urlopen(self.url).read()    
         data = BeautifulSoup(page)
-        #print data
         return data
         
     def scrape(self):
         print "Now Scraping event : " + self.eventId
         # create csv file to write data to
-        filename = "data/weissensee_results.csv"
+        filename = "data/weissensee2_results.csv"
 
         with open(filename, 'a') as fp:        
             self.writer = csv.writer(fp, delimiter=';', quoting=csv.QUOTE_MINIMAL)
@@ -67,10 +66,10 @@ class ScrapeUsers:
           
             # get the data from this URL
             data = self.requestMainDataPage()
-            #print data
             
-            ## Get all the link4 items e.g. the links to the profiles
+            ## list of users checked
             data_checked = []
+            # select the results table
             resultsTable = data.find("table", {"class" : "leaderboard_table_results"})
             # skip the first row        
             userRows = resultsTable.findAll("tr")[1:]        
@@ -86,10 +85,8 @@ class ScrapeUsers:
                         personDict = s.scrape()
                         data = [self.eventId, personDict["user_id"], personDict["name"],  
                                 personDict["country"], personDict["city"], personDict["laps"], 
-                                personDict["distance"], personDict["time"], personDict["speed"]]
-                        print data                        
-                        self.writer.writerow(data)
-                        #print "wrote:", userId         
+                                personDict["distance"], personDict["time"], personDict["speed"]]                       
+                        self.writer.writerow(data)        
             
         print "sleeping ..... "
         time.sleep(1 + random.uniform(0, 1)) 
@@ -98,7 +95,7 @@ class ScrapeUsers:
 #list of eventIds
 events =  ["2020942", "2020945", "2020948"]
 for event in events:
-    s = ScrapeUsers(event)
+    s = ScrapeEvent(event)
     s.scrape()
 
 
