@@ -57,7 +57,7 @@ class ScrapeEvent:
     def scrape(self):
         print "Now Scraping event : " + self.eventId
         # create csv file to write data to
-        filename = "data/weissensee2_results.csv"
+        filename = "data/weissensee_results.csv"
 
         with open(filename, 'a') as fp:        
             self.writer = csv.writer(fp, delimiter=';', quoting=csv.QUOTE_MINIMAL)
