@@ -1,12 +1,14 @@
 ---
-[comment]: <> (title "Weissensee 2015 results exploration")
+[comment]: <> (title "Weissensee results exploration 2014-2016")
 [comment2]: <> (author "Ger Inberg")
 [comment3]: <> (date "20-01-2016")
 output: html_document
 ---
 
+# Weissensee results exploration 2014-2016
+
 ## Introduction
-One of my hobbies is ice-skating and last year I have done the "Alternatieve Elfstedentocht" for the first time. It is an ice skating event held in Austria, over a distance of 200km ([video](https://www.youtube.com/watch?v=FhdifsMYr8s)). In a period of about 10 days multiple events are held, for professionals as well as for amateurs. 
+One of my hobbies is ice-skating and in 2015 I have done the "Alternatieve Elfstedentocht" for the first time. It is an ice skating event held in Austria, over a distance of 200km ([video](https://www.youtube.com/watch?v=FhdifsMYr8s)). In a period of about 10 days multiple events are held, for professionals as well as for amateurs. 
 
 Most participants are from the Netherlands, they are so unfortunate that there is not enough ice on their lakes to organise such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
 First I have scraped the data from the Weissensee website to a [csv file](data/weissensee_results.csv), with a [python script](weissensee_scraper.py). Notice: these results are only from the 3 amateur races that are held in the 10-day period.
@@ -27,14 +29,17 @@ library(ggplot2)
 # Load the Data, combine the two datasets and print some basics
 weissensee <-read.csv("data/weissensee_results.csv", header=TRUE, sep = ";") 
 str(weissensee)
+# add year variable for ease of use
+weissensee$Year = as.numeric(format(as.POSIXct(weissensee$Date, format='%d-%m-%Y'), format="%Y"))
 ```
 
 ## Univariate Plots Section
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
 #plot histograms of interesting features
 #finish time 200km
-weissensee200km <- weissensee[weissensee$Laps==16, ]
+weissensee200km <- weissensee[as.numeric(as.matrix(weissensee$Distance)) == 200.0, ]
 weissensee200km$TimeFormatted  <- as.POSIXct(strptime(weissensee200km$Time, format="%H:%M:%S"))
+weissensee200km$Year = as.numeric(format(as.POSIXct(weissensee200km$Date, format='%d-%m-%Y'), format="%Y"))
 ggplot(data = weissensee200km, aes(x=TimeFormatted)) + geom_histogram() + 
   ggtitle("Distribution of finish times (200km)") + xlab('Time (hours)') + 
   ylab('count')
@@ -53,23 +58,34 @@ ggplot(data = weissensee, aes(x=Distance)) + geom_histogram() +
 summary(weissensee$Distance)
 ```
 
-## Weissensee triple
+## Bivariate Plots Section
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots}
+# finish times per year
+ggplot(data = weissensee200km, aes(x=factor(Year), y=TimeFormatted)) + 
+  geom_jitter(alpha=0.1) + geom_boxplot(alpha=0.1) + 
+  ggtitle("Finish time (200km) per year") + xlab('Year') + ylab('Time (hours)')
+```
+
+
+## Weissensee triple 2015
 
 Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 times in a period of 10 days and I want to know how many people finished 3 times in the full distance and if there is a relation between their finish times.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Triple}
 weissensee_triple <- c()
-names <- unique(weissensee200km$Name)
+weissensee2015 <- weissensee[weissensee$Year == 2015, ]
+weissensee2015_200k <- weissensee2015[as.numeric(as.matrix(weissensee2015$Distance)) == 200.0, ]
+names <- unique(weissensee2015_200k$Name)
 for(i in 1:length(names)){
   name = names[i]
-  temp <- weissensee200km[weissensee200km$Name == name, ]
+  temp <- weissensee2015_200k[weissensee2015_200k$Name == name, ]
   if(nrow(temp) == 3){
     weissensee_triple <- rbind(weissensee_triple, temp)
   }
 }
 #length(unique(weissensee_triple$Name))
 ggplot(data = weissensee_triple, aes(x=factor(EventId), y=Time, color=Name)) + 
-  geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=c("23-1","27-1","30-1")) + 
+  geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=c("23-1-15","27-1-15","30-1-15")) + 
   xlab('Date') + ylab('Finish time')
 ```
 
