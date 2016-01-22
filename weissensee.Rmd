@@ -11,7 +11,7 @@ output: html_document
 One of my hobbies is ice-skating and in 2015 I have done the "Alternatieve Elfstedentocht" for the first time. It is an ice skating event held in Austria, over a distance of 200km ([video](https://www.youtube.com/watch?v=FhdifsMYr8s)). In a period of about 10 days multiple events are held, for professionals as well as for amateurs. 
 
 Most participants are from the Netherlands, they are so unfortunate that there is not enough ice on their lakes to organise such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
-First I have scraped the data from the Weissensee website to a [csv file](data/weissensee_results.csv), with a [python script](weissensee_scraper.py). Notice: these results are only from the 3 amateur races that are held in the 10-day period.
+First I have scraped the data from the Weissensee website to a [csv file](data/weissensee_results.csv), with a [python script](weissensee_scraper.py). Notice: these results are only from the amateur races that are held in the years mentioned above.
 
 [comment4]: <> (<iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>)
 
@@ -22,6 +22,7 @@ First I have scraped the data from the Weissensee website to a [csv file](data/w
 # This prevents the code from displaying in the knitted HTML output.
 
 library(ggplot2)
+library(plyr)
 ```
 
 ## Dataset info
@@ -44,6 +45,15 @@ ggplot(data = weissensee200km, aes(x=TimeFormatted)) + geom_histogram() +
   ggtitle("Distribution of finish times (200km)") + xlab('Time (hours)') + 
   ylab('count')
 #summary(weissensee200km$Time)
+
+# plot participate count in events
+df <- count(weissensee, "Date")
+#change order of levels in order to plot dates in right order
+df$Date2 <- as.POSIXct(df$Date, format='%d-%m-%Y')
+df$Date <- factor(df$Date, levels = df$Date[order(df$Date2)])
+ggplot(data = df) + geom_histogram(aes(x=Date, y=freq), stat="identity") + 
+scale_y_continuous(breaks = seq(0, 1200, 100)) + 
+ggtitle("Number of participants per event") + xlab('Date') + ylab('Count')
 
 #country
 ggplot(data = weissensee, aes(x=Country)) + geom_histogram() + 
