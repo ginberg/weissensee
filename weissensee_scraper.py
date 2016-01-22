@@ -99,12 +99,10 @@ class ScrapeEvent:
                             personDict["distance"], personDict["time"], personDict["speed"]]                       
                     self.writer.writerow(data)        
             
-        print "sleeping ..... "
+        print "Finished scraping event :" + self.eventId     
         time.sleep(1 + random.uniform(0, 1)) 
-        print "done "
 
-#eventDates2 = OrderedDict()
-#eventDates2["220103"] = "24-01-2014"
+
 
 #map with eventId's to dates
 eventDates = OrderedDict()
@@ -115,7 +113,7 @@ eventDates["2020942"] = "23-01-2015"
 eventDates["2020945"] = "27-01-2015"
 eventDates["2020948"] = "30-01-2015"
 eventDates["2021041"] = "19-01-2016"
-#eventDates["2021043"] = "22-01-2016"
+eventDates["2021043"] = "22-01-2016"
 
 # filename to write data to
 FILENAME = "data/weissensee_results.csv"
@@ -125,6 +123,7 @@ try:
 except OSError:
     pass
 
+print "Starting"
 with open(FILENAME, 'a') as fp:
     writer = csv.writer(fp, delimiter=';', quoting=csv.QUOTE_MINIMAL)
     #write header row
@@ -133,7 +132,7 @@ with open(FILENAME, 'a') as fp:
     for event in eventDates:
         s = ScrapeEvent(writer, event, eventDates[event])
         s.scrape()
-
+print "Done"
 
 
 
