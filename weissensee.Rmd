@@ -110,12 +110,12 @@ ggplot(data = weissensee200km, aes(x=factor(Year), y=TimeFormatted)) +
   ggtitle("Finish time (200km) per year") + xlab('Year') + ylab('Time (hours)')
 
 #average finish time per year
-weissensee$nTime <- difftime(strptime(weissensee$Time,"%H:%M:%S"),
+weissensee200km$nTime <- difftime(strptime(weissensee200km$Time,"%H:%M:%S"),
                      strptime("00:00:00","%H:%M:%S"), units="secs")
-weissensee.means <- aggregate(weissensee$nTime, by=list(weissensee$Year), mean)
-weissensee.means$Time <- format(.POSIXct(weissensee.means$x,tz="GMT"), "%H:%M:%S")
-names(weissensee.means) <- c("Year", "x", "Average finish time")
-weissensee.means[, c(1,3)]
+weissensee200km.means <- aggregate(weissensee200km$nTime, by=list(weissensee200km$Year), mean)
+weissensee200km.means$Time <- format(.POSIXct(weissensee200km.means$x,tz="GMT"), "%H:%M:%S")
+names(weissensee200km.means) <- c("Year", "x", "Average finish time")
+weissensee200km.means[, c(1,3)]
 ```
 
 [comment7]: <> ( Multivariate Plots Section)
