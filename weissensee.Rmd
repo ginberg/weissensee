@@ -11,7 +11,7 @@ output: html_document
 One of my hobbies is ice-skating and in 2015 I have done the "Alternatieve Elfstedentocht" for the first time. It is an ice skating event held in Austria, over a distance of 200km ([video](https://www.youtube.com/watch?v=FhdifsMYr8s)). In a period of about 10 days multiple events are held, for professionals as well as for amateurs. 
 
 Most participants are from the Netherlands, they are so unfortunate that there is not enough ice on their lakes to organise such an event. Because I was interested in how many people finished the 200km and what the average finish time was, I have done some data analysis.
-First I have scraped the data from the Weissensee website to a [csv file](data/weissensee_results.csv), with a [python script](weissensee_scraper.py). Notice: these results are only from the amateur races that are held in the years mentioned above.
+First I have scraped the data from the Weissensee website to a [csv file](data/weissensee_results.csv), with a [python script](weissensee_scraper.py). Notice: these results are only from the amateur 200km races that are held in the years mentioned above.
 
 [comment4]: <> (<iframe width="560" height="315" src="http://youtube.com/embed/FhdifsMYr8s"; frameborder="0" allowfullscreen></iframe>)
 
@@ -34,9 +34,13 @@ str(weissensee)
 weissensee$Year = as.numeric(format(as.POSIXct(weissensee$Date, format='%d-%m-%Y'), format="%Y"))
 ```
 
-## Univariate Plots Section
-```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
-#plot histograms of interesting features
+[comment5]: <> ( Univariate Plots Section)
+
+### Finish times (200km)
+
+The event is held at a lake where the participants skate some amount of laps to complete the 200km distance. Mostly a lap is between 10 and 25km, depending on the ice conditions. A larger lap size is supposed to lead to a faster finish time, because bigger groups can form, so there is less air resistance. Also corners slow down. The plot above shows the finish times of all the events. It follows a normal distribution quite well.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, FinishTimes}
 #finish time 200km
 weissensee200km <- weissensee[as.numeric(as.matrix(weissensee$Distance)) == 200.0, ]
 weissensee200km$TimeFormatted  <- as.POSIXct(strptime(weissensee200km$Time, format="%H:%M:%S"))
@@ -45,7 +49,13 @@ ggplot(data = weissensee200km, aes(x=TimeFormatted)) + geom_histogram() +
   ggtitle("Distribution of finish times (200km)") + xlab('Time (hours)') + 
   ylab('count')
 #summary(weissensee200km$Time)
+```
 
+### Participants count
+
+The histogram displays the number of participants per event.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, ParticipantsCount}
 # plot participate count in events
 df <- count(weissensee, "Date")
 #change order of levels in order to plot dates in right order
@@ -54,21 +64,39 @@ df$Date <- factor(df$Date, levels = df$Date[order(df$Date2)])
 ggplot(data = df) + geom_histogram(aes(x=Date, y=freq), stat="identity") + 
 scale_y_continuous(breaks = seq(0, 1200, 100)) + 
 ggtitle("Number of participants per event") + xlab('Date') + ylab('Count')
+```
 
+### Participants country of residence
+
+Well, I guess the histogram says it all, you can call this a Dutch event!
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, ParticipantsResidence}
 #country
 ggplot(data = weissensee, aes(x=Country)) + geom_histogram() + 
   scale_y_log10() + ggtitle("Country of residence of participants") + 
   xlab('Country') + ylab('count (log scale)')
 summary(weissensee$Country) 
+```
 
+### Completed distance
+
+Not all people can finish the 200km distance, because of various reasons: crashes, bad material, bad condition, etc. Fortunately, one can skate a shorter distance: simply skate less laps. The histogram shows that most people can finish the 200km, 150km is the next best.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, CoveredDistance}
 #Distance
-ggplot(data = weissensee, aes(x=Distance)) + geom_histogram() +
-  scale_y_sqrt() + ggtitle("Distribution of covered distance") + 
-  xlab('Distance') + ylab('count (sqrt scale)')
+ggplot(data = weissensee, aes(x=as.factor(Distance))) + geom_histogram() +
+  scale_y_sqrt() + ggtitle("Distribution of completed distance") + 
+  xlab('Distance') + ylab('count (sqrt scale)') + 
+  scale_x_discrete(breaks = seq(100, 200, 10))
 summary(weissensee$Distance)
 ```
 
-## Bivariate Plots Section
+[comment6]: <> ( Bivariate Plots Section)
+
+### Finish times (200km) per year 
+
+Distribution of the finish times per year. The black box is the interquartile range. Since 2016 is not yet complete, it has less points.
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots}
 # finish times per year
 ggplot(data = weissensee200km, aes(x=factor(Year), y=TimeFormatted)) + 
@@ -76,7 +104,7 @@ ggplot(data = weissensee200km, aes(x=factor(Year), y=TimeFormatted)) +
   ggtitle("Finish time (200km) per year") + xlab('Year') + ylab('Time (hours)')
 ```
 
-
+[comment7]: <> ( Multivariate Plots Section)
 ## Weissensee triple 2015
 
 Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 times in a period of 10 days and I want to know how many people finished 3 times in the full distance and if there is a relation between their finish times.
