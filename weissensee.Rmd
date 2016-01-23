@@ -23,6 +23,8 @@ First I have scraped the data from the Weissensee website to a [csv file](data/w
 
 library(ggplot2)
 library(plyr)
+library(grid)
+library(gridExtra)
 ```
 
 ## Dataset info
@@ -117,31 +119,41 @@ summary(weissensee$Distance)
 ```
 
 [comment7]: <> ( Multivariate Plots Section)
-## Weissensee triple 2015
+## Weissensee triple
 
-Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 times in a period of 10 days and I want to know how many people finished 3 times in the full distance and if there is a relation between their finish times.
+Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 or 4 times in a period of 10 days and I am curious who finished at least 3 times in the full distance and what their times were.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Triple}
-weissensee_triple <- c()
-weissensee2015 <- weissensee[weissensee$Year == 2015, ]
-weissensee2015_200k <- weissensee2015[as.numeric(as.matrix(weissensee2015$Distance)) == 200.0, ]
-names <- unique(weissensee2015_200k$Name)
-for(i in 1:length(names)){
-  name = names[i]
-  temp <- weissensee2015_200k[weissensee2015_200k$Name == name, ]
-  if(nrow(temp) == 3){
-    weissensee_triple <- rbind(weissensee_triple, temp)
+plotWeissenseeTriple = function(year, yearLabels){
+  weissensee_triple <- c()
+  weissenseeYear <- weissensee[weissensee$Year == year, ]
+  weissenseeYear_200k <- weissenseeYear[as.numeric(as.matrix(weissenseeYear$Distance)) == 200.0, ]
+  names <- unique(weissenseeYear_200k$Name)
+  for(i in 1:length(names)){
+    name = names[i]
+    temp <- weissenseeYear_200k[weissenseeYear_200k$Name == name, ]
+    if(nrow(temp) == 3){
+      if (length(unique(temp$Date)) == 3){
+        weissensee_triple <- rbind(weissensee_triple, temp)
+      }
+    }
   }
+  weissensee_triple$TimeFormatted  <- as.POSIXct(strptime(weissensee_triple$Time, format="%H:%M:%S"))
+  plot <- ggplot(data = weissensee_triple, aes(x=factor(EventId), y=TimeFormatted, color=Name)) + 
+  geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=yearLabels) + 
+  xlab('Date') + ylab('Finish time') + ggtitle(year)
+  plot
 }
-#length(unique(weissensee_triple$Name))
-ggplot(data = weissensee_triple, aes(x=factor(EventId), y=Time, color=Name)) + 
-  geom_point() + geom_line(aes(group=Name)) + scale_x_discrete(labels=c("23-1-15","27-1-15","30-1-15")) + 
-  xlab('Date') + ylab('Finish time')
+plot2014 <- plotWeissenseeTriple(2014, c("24-1-14","28-1-14","30-1-14"))
+plot2015 <- plotWeissenseeTriple(2015, c("23-1-15","27-1-15","30-1-15"))
+#plot2016 <- plotWeissenseeTriple(2016, c("19-1-16","22-1-16","26-1-16"))
+grid.arrange(plot2014, plot2015, ncol = 1)
 ```
 
-So, there were 6 brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
+So, there are a couple brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
 
 ## Ideas for future work
-* relate the finish times to weather conditions (wind, snow conditions, temperature)
-* compare the year 2015 to results of other years and look for trends
+* relate finish times to weather conditions (wind, snow conditions, temperature)
+* relate finish times to lap size
+* add results of other years and look for trends
 
