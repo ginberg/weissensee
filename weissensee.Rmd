@@ -38,7 +38,7 @@ weissensee$Year = as.numeric(format(as.POSIXct(weissensee$Date, format='%d-%m-%Y
 
 ### Finish times (200km)
 
-The event is held at a lake where the participants skate some amount of laps to complete the 200km distance. Mostly a lap is between 10 and 25km, depending on the ice conditions. A larger lap size is supposed to lead to a faster finish time, because bigger groups can form, so there is less air resistance. Also corners slow down. The plot above shows the finish times of all the events. It follows a normal distribution quite well. Average and standard deviation given below.
+The event is held at a lake where the participants skate some amount of laps to complete the 200km distance. Mostly a lap is between 10 and 25km, depending on the ice conditions. A larger lap size is supposed to lead to a faster finish time, because bigger groups can form, so there is less air resistance. Also corners slow down. The plot above shows the finish times of all the events. It follows a normal distribution quite well.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, FinishTimes}
 #finish time 200km
@@ -47,14 +47,14 @@ weissensee200km$TimeFormatted  <- as.POSIXct(strptime(weissensee200km$Time, form
 weissensee200km$Year = as.numeric(format(as.POSIXct(weissensee200km$Date, format='%d-%m-%Y'), format="%Y"))
 weissensee200km$nTime <- difftime(strptime(weissensee200km$Time,"%H:%M:%S"),
                      strptime("00:00:00","%H:%M:%S"), units="secs")
-#average,sd
-average <- format(.POSIXct(mean(weissensee200km$nTime),tz="GMT"), "%H:%M:%S")
-sd <- format(.POSIXct(sd(weissensee200km$nTime),tz="GMT"), "%H:%M:%S")
-sprintf("Average: %s, standard deviation: %s", average, sd)
-
+#plot
 ggplot(data = weissensee200km, aes(x=TimeFormatted)) + geom_histogram() + 
   ggtitle("Distribution of finish times (200km)") + xlab('Time (hours)') + 
   ylab('count') + geom_vline(xintercept=as.numeric(mean(weissensee200km$TimeFormatted))[1], colour = "red")
+#print average,sd
+average <- format(.POSIXct(mean(weissensee200km$nTime),tz="GMT"), "%H:%M:%S")
+sd <- format(.POSIXct(sd(weissensee200km$nTime),tz="GMT"), "%H:%M:%S")
+sprintf("Average: %s, standard deviation: %s", average, sd)
 ```
 
 ### Participants count
