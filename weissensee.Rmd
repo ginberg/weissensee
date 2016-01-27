@@ -146,8 +146,8 @@ plotWeissenseeTriple = function(year, yearLabels){
 }
 plot2014 <- plotWeissenseeTriple(2014, c("24-1-14","28-1-14","30-1-14"))
 plot2015 <- plotWeissenseeTriple(2015, c("23-1-15","27-1-15","30-1-15"))
-#plot2016 <- plotWeissenseeTriple(2016, c("19-1-16","22-1-16","26-1-16"))
-grid.arrange(plot2014, plot2015, ncol = 1)
+plot2016 <- plotWeissenseeTriple(2016, c("19-1-16","22-1-16","26-1-16"))
+grid.arrange(plot2014, plot2015, plot2016, ncol = 1)
 ```
 
 So, there are a couple brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
