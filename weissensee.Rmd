@@ -119,12 +119,12 @@ summary(weissensee$Distance)
 ```
 
 [comment7]: <> ( Multivariate Plots Section)
-## Weissensee triple
+## Weissensee to the max
 
-Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 or 4 times in a period of 10 days and I am curious who finished at least 3 times in the full distance and what their times were.
+Some participants just can't get enough of ice-skating and are participating multiple times in the event. The event is held 3 or 4 times in a period of 10 days and I am curious who finished all 3 or 4 times in the full distance and what their times were.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, Triple}
-plotWeissenseeTriple = function(year, yearLabels){
+plotWeissenseeTriple = function(year, yearLabels, n){
   weissensee_triple <- c()
   weissenseeYear <- weissensee[weissensee$Year == year, ]
   weissenseeYear_200k <- weissenseeYear[as.numeric(as.matrix(weissenseeYear$Distance)) == 200.0, ]
@@ -132,8 +132,8 @@ plotWeissenseeTriple = function(year, yearLabels){
   for(i in 1:length(names)){
     name = names[i]
     temp <- weissenseeYear_200k[weissenseeYear_200k$Name == name, ]
-    if(nrow(temp) == 3){
-      if (length(unique(temp$Date)) == 3){
+    if(nrow(temp) == n){
+      if (length(unique(temp$Date)) == n){
         weissensee_triple <- rbind(weissensee_triple, temp)
       }
     }
@@ -144,13 +144,13 @@ plotWeissenseeTriple = function(year, yearLabels){
   xlab('Date') + ylab('Finish time') + ggtitle(year)
   plot
 }
-plot2014 <- plotWeissenseeTriple(2014, c("24-1-14","28-1-14","30-1-14"))
-plot2015 <- plotWeissenseeTriple(2015, c("23-1-15","27-1-15","30-1-15"))
-plot2016 <- plotWeissenseeTriple(2016, c("19-1-16","22-1-16","26-1-16"))
+plot2014 <- plotWeissenseeTriple(2014, c("24-1-14","28-1-14","30-1-14"), 3)
+plot2015 <- plotWeissenseeTriple(2015, c("23-1-15","27-1-15","30-1-15"), 3)
+plot2016 <- plotWeissenseeTriple(2016, c("19-1-16","22-1-16","26-1-16", "29-1-16"), 4)
 grid.arrange(plot2014, plot2015, plot2016, ncol = 1)
 ```
 
-So, there are a couple brave man that finished 3 times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
+So, there are a couple brave man that finished all times! Unfortunately, it is hard to see a trend in finish times for these individuals. Some had their fastest time in the first event, some in the second and only one in the last event. Of course, the finish time depends on a lot of factors, including the individuals capabilities, weather conditions, etc.
 
 ## Ideas for future work
 * relate finish times to weather conditions (wind, snow conditions, temperature)

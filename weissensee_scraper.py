@@ -106,14 +106,16 @@ class ScrapeEvent:
 
 #map with eventId's to dates
 eventDates = OrderedDict()
-eventDates["220103"] = "24-01-2014"
-eventDates["220105"] = "28-01-2014"
-eventDates["220108"] = "30-01-2014"
-eventDates["2020942"] = "23-01-2015"
-eventDates["2020945"] = "27-01-2015"
-eventDates["2020948"] = "30-01-2015"
-eventDates["2021041"] = "19-01-2016"
-eventDates["2021043"] = "22-01-2016"
+eventDates["220103"] = "24-1-2014"
+eventDates["220105"] = "28-1-2014"
+eventDates["220108"] = "30-1-2014"
+eventDates["2020942"] = "23-1-2015"
+eventDates["2020945"] = "27-1-2015"
+eventDates["2020948"] = "30-1-2015"
+eventDates["2021041"] = "19-1-2016"
+eventDates["2021043"] = "22-1-2016"
+eventDates["2021046"] = "26-1-2016"
+eventDates["2021049"] = "29-1-2016"
 
 # filename to write data to
 FILENAME = "data/weissensee_results.csv"
