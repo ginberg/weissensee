@@ -11,37 +11,48 @@ import urllib2, time, random, csv, os
 from collections import OrderedDict
 
 class ScrapeUser:
-    def __init__(self, date, data, id):
+    def __init__(self, date, data, id, eventId):
         self.date = date        
-        self.data = data        
+        self.data = data
+        self.eventId = eventId        
         self.persondict = {}
         self.persondict["id"] = id
 
-    def toUnicode(self, data):
-        if len(data.contents) >= 1:
-            return data.contents[0].encode('utf8')
+    def toUnicode(self, data, index, subContent):
+        if len(data.contents) > index:
+            if subContent:
+                subContent = data.contents[index].contents[0]
+                return subContent.encode('utf8')
+            else:
+                return data.contents[index].encode('utf8')
         else:
-            return data
+            if data.string is None:
+                return ''
+            else:
+                return data
               
     def getPersonalia(self):
         #print self.data
-        self.persondict["name"] = self.toUnicode(self.data[3])
-        self.persondict["country"] = self.data[4].contents[1].contents[0]
-        self.persondict["city"] = self.toUnicode(self.data[5])
+        self.persondict["name"] = self.toUnicode(self.data[3], 0, False)
+        self.persondict["country"] = self.toUnicode(self.data[4], 1, True)
+        self.persondict["city"] = self.toUnicode(self.data[5], 0, False)
         self.persondict["laps"] = self.data[7].contents[0]
         self.persondict["distance"] = self.data[8].contents[0]
         self.persondict["time"] = self.data[9].contents[0]
-        # add diff it it has a value 
+        # add diff if it has a value 
         diff = self.data[10].contents
         if diff:
             self.persondict["diff"] = diff[0]
         else:
             self.persondict["diff"] = 0
-        speed = self.data[11]        
-        # from 2015 speed is available
-        year = int(self.date.split("-")[2])
-        if year >= 2015:
-            self.persondict["speed"] = speed.contents[0]        
+        speed = self.data[11]               
+        # speed is not always available, do some checks
+        if len(speed.contents) >= 1:
+            speedString = speed.contents[0].string
+            if speedString is not None and "km/h" in speedString:
+                self.persondict["speed"] = speedString  
+            else:
+                self.persondict["speed"] = 'NaN'            
         else:
             self.persondict["speed"] = 'NaN'        
         
@@ -60,8 +71,8 @@ class ScrapeEvent:
         self.eventId = eventId
         self.date = date
         
-    def updateURL(self):
-        self.url = "http://live.ultimate.dk/desktop/front/data.php?mode=leaderboard&leaderboardid=0&distance=1&olddistance=1&category=&show=standings&language=nl&records=%s&eventid=%s" % (self.AMOUNT_OF_RECORDS, self.eventId)
+    def updateURL(self, distance):
+        self.url = "http://live.ultimate.dk/desktop/front/data.php?mode=leaderboard&leaderboardid=0&olddistance=1&category=&show=standings&language=nl&records=%s&eventid=%s&distance=%s" % (self.AMOUNT_OF_RECORDS, self.eventId, distance)       
         print self.url        
                 
     def requestMainDataPage(self):
@@ -70,37 +81,40 @@ class ScrapeEvent:
         return data
         
     def scrape(self):
-        print "Now Scraping event : " + self.eventId     
+        # Distance 1 = 200km, 2 = 100km
+        distances = ["1", "2"]
+        for distance in distances:
+            print "Now Scraping event-distance : " + self.eventId + "-" + distance
 
-        # generate the Url
-        self.updateURL()
-      
-        # get the data from this URL
-        data = self.requestMainDataPage()
-        
-        ## list of users checked
-        data_checked = []
-        # select the results table
-        resultsTable = data.find("table", {"class" : "leaderboard_table_results"})
-        # skip the first row        
-        userRows = resultsTable.findAll("tr")[1:]        
-        for userRow in userRows:
-            userContents = userRow.findAll("td")
-            if len(userContents) > 1:
-                id = userContents[2].text
-                #print id
-                if not id in data_checked:
-                    data_checked.append(id)
-                    #print "scraping user:",  id
-                    s = ScrapeUser(self.date, userContents, id)
-                    personDict = s.scrape()
-                    data = [self.eventId, self.date, personDict["id"], personDict["name"],  
-                            personDict["country"], personDict["city"], personDict["laps"], 
-                            personDict["distance"], personDict["time"], personDict["speed"]]                       
-                    self.writer.writerow(data)        
+            # generate the Url
+            self.updateURL(distance)
+          
+            # get the data from this URL
+            data = self.requestMainDataPage()
             
-        print "Finished scraping event :" + self.eventId     
-        time.sleep(1 + random.uniform(0, 1)) 
+            ## list of users checked
+            data_checked = []
+            # select the results table
+            resultsTable = data.find("table", {"class" : "leaderboard_table_results"})
+            # skip the first row        
+            userRows = resultsTable.findAll("tr")[1:]        
+            for userRow in userRows:
+                userContents = userRow.findAll("td")
+                if len(userContents) > 1:
+                    id = userContents[2].text
+                    #print id
+                    if not id in data_checked:
+                        data_checked.append(id)
+                        #print "scraping user:",  id
+                        s = ScrapeUser(self.date, userContents, id, self.eventId)
+                        personDict = s.scrape()
+                        data = [self.eventId, self.date, personDict["id"], personDict["name"],  
+                                personDict["country"], personDict["city"], personDict["laps"], 
+                                personDict["distance"], personDict["time"], personDict["speed"]]                       
+                        self.writer.writerow(data)        
+                
+            print "Finished scraping event-distance :" + self.eventId + "-" + distance 
+            time.sleep(1 + random.uniform(0, 1)) 
 
 
 
